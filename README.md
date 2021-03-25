@@ -11,8 +11,8 @@ inference library.
 [Unity Barracuda]:
   https://docs.unity3d.com/Packages/com.unity.barracuda@latest
 
-About the ONNX model
---------------------
+About the ONNX file
+-------------------
 
 The segmentation model was converted into ONNX by PINTO0309 (Katsuya Hyodo).
 Please check [his model zoo] for further details.
@@ -23,12 +23,12 @@ About the license
 -----------------
 
 Even though the repository contains the original license (Apache 2.0), the
-original developer (Google) changed it to [Google Terms of Service] after the
-initial release.
+developer (Google) changed it to [Google Terms of Service] after the initial
+release.
 
 [Google Terms of Service]: https://policies.google.com/terms?hl=en-US
 
-There are some threads trying to make it clear if we can use the model in
+There are [some threads] trying to make it clear if we can use the model in
 commercial/non-commercial projects, but at the moment, there is no clear
 conclusion.
 
