@@ -34,5 +34,5 @@ conclusion.
 
 [some threads]: https://github.com/PINTO0309/PINTO_model_zoo/issues/69
 
-I'd recommend **not** using the model in practical applications. Please ask a
+I'd recommend **NOT** using the model in practical applications. Please ask a
 lawyer for further advice.
