@@ -1,0 +1,12 @@
+#pragma kernel Postprocess
+
+Texture2D<float2> _InputTexture;
+RWTexture2D<float> _OutputTexture;
+
+[numthreads(8, 8, 1)]
+void Postprocess(uint3 id : SV_DispatchThreadID)
+{
+    // Softmax function
+    float2 e = exp(_InputTexture[id.xy]);
+    _OutputTexture[id.xy] = e.y / (e.x + e.y);
+}
