@@ -1,12 +1,77 @@
-#pragma kernel Postprocess
+#pragma kernel Postprocess1
+#pragma kernel Postprocess2
+#pragma kernel Postprocess3
 
-Texture2D<float2> _InputTexture;
-RWTexture2D<float> _OutputTexture;
+uint2 _Dimensions;
+Texture2D<float2> _Inference;
+Texture2D<float> _MaskInput;
+RWTexture2D<float> _MaskOutput;
+
+// Postprocess1: Softmax + erosion
+
+float GetSoftmax(uint2 pos)
+{
+    float2 e = exp(_Inference[pos]);
+    return e.y / (e.x + e.y);
+}
 
 [numthreads(8, 8, 1)]
-void Postprocess(uint3 id : SV_DispatchThreadID)
+void Postprocess1(uint2 id : SV_DispatchThreadID)
 {
-    // Softmax function
-    float2 e = exp(_InputTexture[id.xy]);
-    _OutputTexture[id.xy] = e.y / (e.x + e.y);
+    uint xL = max(id.x, 1) - 1;
+    uint xR = min(id.x + 1, _Dimensions.x - 1);
+    uint yT = max(id.y, 1) - 1;
+    uint yB = min(id.y + 1, _Dimensions.y - 1);
+
+    float m1 = GetSoftmax(id);
+    float m2 = GetSoftmax(uint2(xL, id.y));
+    float m3 = GetSoftmax(uint2(xR, id.y));
+    float m4 = GetSoftmax(uint2(id.x, yT));
+    float m5 = GetSoftmax(uint2(id.x, yB));
+
+    _MaskOutput[id] = min(min(min(min(m1, m2), m3), m4), m5);
+}
+
+// Postprocess2: horizontal bilateral filter (3-tap)
+
+float GetWeight(float i1, float i2)
+{
+    float d = i2 - i1;
+    return exp(-0.5 * d * d);
+}
+
+[numthreads(8, 8, 1)]
+void Postprocess2(uint2 id : SV_DispatchThreadID)
+{
+    uint xL = max(id.x, 1) - 1;
+    uint xR = min(id.x + 1, _Dimensions.x - 1);
+
+    float m1 = _MaskInput[uint2(xL, id.y)];
+    float m2 = _MaskInput[id];
+    float m3 = _MaskInput[uint2(xR, id.y)];
+
+    float w1 = 0.27901 * GetWeight(m1, m2);
+    float w2 = 0.44198;
+    float w3 = 0.27901 * GetWeight(m3, m2);
+
+    _MaskOutput[id] = (m1 * w1 + m2 * w2 + m3 * w3) / (w1 + w2 + w3);
+}
+
+// Postprocess3: Vertical bilateral filter (3-tap)
+
+[numthreads(8, 8, 1)]
+void Postprocess3(uint2 id : SV_DispatchThreadID)
+{
+    uint yT = max(id.y, 1) - 1;
+    uint yB = min(id.y + 1, _Dimensions.y - 1);
+
+    float m1 = _MaskInput[uint2(id.x, yT)];
+    float m2 = _MaskInput[id];
+    float m3 = _MaskInput[uint2(id.x, yB)];
+
+    float w1 = 0.27901 * GetWeight(m1, m2);
+    float w2 = 0.44198;
+    float w3 = 0.27901 * GetWeight(m3, m2);
+
+    _MaskOutput[id] = (m1 * w1 + m2 * w2 + m3 * w3) / (w1 + w2 + w3);
 }

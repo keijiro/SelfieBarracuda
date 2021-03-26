@@ -7,6 +7,9 @@ static class RTUtil
     public const RenderTextureFormat SingleChannelFormat
       = RenderTextureFormat.R8;
 
+    public const RenderTextureFormat SingleChannelFloatFormat
+      = RenderTextureFormat.RHalf;
+
     public const RenderTextureFormat DoubleChannelFloatFormat
       = RenderTextureFormat.RGHalf;
 
@@ -18,13 +21,27 @@ static class RTUtil
         return rt;
     }
 
-    public static RenderTexture NewDoubleChannelFloatUAV(int width, int height)
+    public static RenderTexture NewSingleChannelFloatUAV(int width, int height)
     {
-        var rt = new RenderTexture(width, height, 0, DoubleChannelFloatFormat);
+        var rt = new RenderTexture(width, height, 0, SingleChannelFloatFormat);
         rt.enableRandomWrite = true;
         rt.Create();
         return rt;
     }
+
+    public static RenderTexture NewDoubleChannelFloat(int width, int height)
+      => new RenderTexture(width, height, 0, DoubleChannelFloatFormat);
+
+    public static RenderTexture NewDoubleChannelFloatUAV(int width, int height)
+    {
+        var rt = NewDoubleChannelFloat(width, height);
+        rt.enableRandomWrite = true;
+        rt.Create();
+        return rt;
+    }
+
+    public static RenderTexture TempSingleChannelFloat(int width, int height)
+      => RenderTexture.GetTemporary(width, height, 0, SingleChannelFloatFormat);
 
     public static RenderTexture TempDoubleChannelFloat(int width, int height)
       => RenderTexture.GetTemporary(width, height, 0, DoubleChannelFloatFormat);

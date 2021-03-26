@@ -11,13 +11,18 @@ Shader "Hidden/MeetBarracuda/Composition"
     float4 Fragment(float4 position : SV_Position,
                     float2 uv : TEXCOORD0) : SV_Target
     {
-        float3 src = tex2D(_SourceTexture, uv).rgb;
-        float mask = tex2D(_MaskTexture, uv).r;
         float3 bg = tex2D(_BGTexture, uv).rgb;
+        float3 fg = tex2D(_SourceTexture, uv).rgb;
+        float mask = tex2D(_MaskTexture, uv).r;
 
-        mask = smoothstep(0.2, 0.8, mask);
+        // Screen blend mode
+        float3 bl = 1 - (1 - fg) * (1 - bg);
 
-        return float4(lerp(bg, src, mask) , 1);
+        // Interpolation
+        float3 rgb = bg;
+        rgb = lerp(rgb, bl, saturate((mask - 0.2) / 0.4));
+        rgb = lerp(rgb, fg, saturate((mask - 0.6) / 0.4));
+        return float4(rgb , 1);
     }
 
     ENDCG
