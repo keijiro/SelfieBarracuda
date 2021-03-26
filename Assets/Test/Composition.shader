@@ -15,13 +15,13 @@ Shader "Hidden/MeetBarracuda/Composition"
         float3 fg = tex2D(_SourceTexture, uv).rgb;
         float mask = tex2D(_MaskTexture, uv).r;
 
-        // Screen blend mode
-        float3 bl = 1 - (1 - fg) * (1 - bg);
+        // Overlay blend mode
+        float3 bl = fg < 0.5 ? 2 * bg * fg : 1 - 2 * (1 - bg) * (1 - fg);
 
         // Interpolation
         float3 rgb = bg;
-        rgb = lerp(rgb, bl, saturate((mask - 0.2) / 0.4));
-        rgb = lerp(rgb, fg, saturate((mask - 0.6) / 0.4));
+        rgb = lerp(rgb, bl, saturate((mask - 0.1) / 0.4));
+        rgb = lerp(rgb, fg, saturate((mask - 0.5) / 0.4));
         return float4(rgb , 1);
     }
 
