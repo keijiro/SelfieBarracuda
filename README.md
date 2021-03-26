@@ -1,6 +1,8 @@
 MeetBarracuda
 =============
 
+![gif](https://i.imgur.com/Pf0HKFe.gif)
+
 **MeetBarracuda** is a human segmentation filter that runs the
 [MediaPipe Meet Segmentation Model] on the [Unity Barracuda] neural network
 inference library.
