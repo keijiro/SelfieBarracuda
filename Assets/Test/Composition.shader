@@ -8,10 +8,8 @@ Shader "Hidden/MeetBarracuda/Composition"
     sampler2D _MaskTexture;
     sampler2D _BGTexture;
 
-    float4 Fragment(float4 position : SV_Position,
-                    float2 uv : TEXCOORD0) : SV_Target
+    float4 CompositeForeground(float2 uv, float3 bg)
     {
-        float3 bg = tex2D(_BGTexture, uv).rgb;
         float3 fg = tex2D(_SourceTexture, uv).rgb;
         float mask = tex2D(_MaskTexture, uv).r;
 
@@ -25,6 +23,42 @@ Shader "Hidden/MeetBarracuda/Composition"
         return float4(rgb , 1);
     }
 
+    float4 FragmentThru(float4 position : SV_Position,
+                        float2 uv : TEXCOORD0) : SV_Target
+    {
+        return tex2D(_SourceTexture, uv);
+    }
+
+    float4 FragmentMask(float4 position : SV_Position,
+                        float2 uv : TEXCOORD0) : SV_Target
+    {
+        return tex2D(_MaskTexture, uv).r;
+    }
+
+    float4 FragmentStatic(float4 position : SV_Position,
+                          float2 uv : TEXCOORD0) : SV_Target
+    {
+        return CompositeForeground(uv, tex2D(_BGTexture, uv).rgb);
+    }
+
+    float4 FragmentDynamic(float4 position : SV_Position,
+                           float2 uv : TEXCOORD0) : SV_Target
+    {
+        // Polar coodinates
+        float2 p = (uv - 0.5) * float2(_ScreenParams.x / _ScreenParams.y, 1);
+        p = float2(atan2(p.x, p.y), length(p));
+
+        // Wavy animation
+        float hue = p.x * 2.0 / UNITY_PI - _Time.y * 0.5;
+        hue += sin(p.y * 5 - _Time.y * 3.3) * 0.2;
+
+        // Hue to RGB
+        float h = frac(hue) * 6 - 2;
+        float3 rgb = saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
+
+        return CompositeForeground(uv, rgb);
+    }
+
     ENDCG
 
     SubShader
@@ -34,7 +68,28 @@ Shader "Hidden/MeetBarracuda/Composition"
         {
             CGPROGRAM
             #pragma vertex vert_img
-            #pragma fragment Fragment
+            #pragma fragment FragmentThru
+            ENDCG
+        }
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment FragmentMask
+            ENDCG
+        }
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment FragmentStatic
+            ENDCG
+        }
+        Pass
+        {
+            CGPROGRAM
+            #pragma vertex vert_img
+            #pragma fragment FragmentDynamic
             ENDCG
         }
     }

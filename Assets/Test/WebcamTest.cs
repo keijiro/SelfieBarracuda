@@ -5,9 +5,12 @@ namespace MeetBarracuda {
 
 public sealed class WebcamTest : MonoBehaviour
 {
+    enum OutputMode { Source, Mask, StaticBG, DynamicBG }
+
     [SerializeField] WebcamInput _webcam = null;
-    [SerializeField] Texture2D _background = null;
-    [SerializeField] UI.RawImage _imageUI = null;
+    [SerializeField] OutputMode _outputMode = OutputMode.StaticBG;
+    [SerializeField] Texture2D _bgImage = null;
+    [SerializeField] UI.RawImage _outputUI = null;
     [SerializeField] ResourceSet _resources = null;
     [SerializeField] Shader _shader = null;
 
@@ -35,10 +38,10 @@ public sealed class WebcamTest : MonoBehaviour
 
         _material.SetTexture("_SourceTexture", _webcam.Texture);
         _material.SetTexture("_MaskTexture", _filter.MaskTexture);
-        _material.SetTexture("_BGTexture", _background);
-        Graphics.Blit(null, _composited, _material, 0);
+        _material.SetTexture("_BGTexture", _bgImage);
+        Graphics.Blit(null, _composited, _material, (int)_outputMode);
 
-        _imageUI.texture = _composited;
+        _outputUI.texture = _composited;
     }
 }
 
