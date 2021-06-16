@@ -1,7 +1,7 @@
 SelfieBarracuda
 ===============
 
-![gif](https://i.imgur.com/Pf0HKFe.gif)
+![gif](https://user-images.githubusercontent.com/343936/122239428-e3451280-cefb-11eb-8f77-1633226477c3.gif)
 
 **SelfieBarracuda** is a human segmentation filter that runs the
 [MediaPipe Selfie Segmentation Model] on the [Unity Barracuda] neural network
