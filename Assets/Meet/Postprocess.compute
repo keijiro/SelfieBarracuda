@@ -3,7 +3,7 @@
 #pragma kernel Postprocess3
 
 uint2 _Dimensions;
-Texture2D<float2> _Inference;
+Texture2D<float> _Inference;
 Texture2D<float> _MaskInput;
 RWTexture2D<float> _MaskOutput;
 
