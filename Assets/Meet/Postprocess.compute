@@ -9,12 +9,6 @@ RWTexture2D<float> _MaskOutput;
 
 // Postprocess1: Softmax + erosion
 
-float GetSoftmax(uint2 pos)
-{
-    float2 e = exp(_Inference[pos]);
-    return e.y / (e.x + e.y);
-}
-
 [numthreads(8, 8, 1)]
 void Postprocess1(uint2 id : SV_DispatchThreadID)
 {
@@ -23,11 +17,11 @@ void Postprocess1(uint2 id : SV_DispatchThreadID)
     uint yT = max(id.y, 1) - 1;
     uint yB = min(id.y + 1, _Dimensions.y - 1);
 
-    float m1 = GetSoftmax(id);
-    float m2 = GetSoftmax(uint2(xL, id.y));
-    float m3 = GetSoftmax(uint2(xR, id.y));
-    float m4 = GetSoftmax(uint2(id.x, yT));
-    float m5 = GetSoftmax(uint2(id.x, yB));
+    float m1 = _Inference[id];
+    float m2 = _Inference[uint2(xL, id.y)];
+    float m3 = _Inference[uint2(xR, id.y)];
+    float m4 = _Inference[uint2(id.x, yT)];
+    float m5 = _Inference[uint2(id.x, yB)];
 
     _MaskOutput[id] = min(min(min(min(m1, m2), m3), m4), m5);
 }

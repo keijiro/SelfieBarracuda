@@ -14,7 +14,7 @@ public sealed class SegmentationFilter : System.IDisposable
 
         var dim = (x: Config.ImageWidth, y: Config.ImageHeight);
         _buffers = (new ComputeBuffer(dim.x * dim.y * 3, sizeof(float)),
-                    RTUtil.NewDoubleChannelFloat(dim.x, dim.y),
+                    RTUtil.NewSingleChannelFloat(dim.x, dim.y),
                     RTUtil.NewSingleChannelFloatUAV(dim.x, dim.y),
                     RTUtil.NewSingleChannelFloatUAV(dim.x, dim.y),
                     RTUtil.NewSingleChannelUAV(dim.x, dim.y));

@@ -29,6 +29,9 @@ static class RTUtil
         return rt;
     }
 
+    public static RenderTexture NewSingleChannelFloat(int width, int height)
+      => new RenderTexture(width, height, 0, SingleChannelFloatFormat);
+
     public static RenderTexture NewDoubleChannelFloat(int width, int height)
       => new RenderTexture(width, height, 0, DoubleChannelFloatFormat);
 
