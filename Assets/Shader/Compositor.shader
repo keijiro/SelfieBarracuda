@@ -8,6 +8,15 @@ Shader "Hidden/SelfieBarracuda/Compositor"
     sampler2D _MaskTexture;
     sampler2D _BGTexture;
 
+    void Vertex(float4 position : POSITION,
+                float2 uv : TEXCOORD0,
+                out float4 outPosition : SV_Position,
+                out float2 outUV : TEXCOORD0)
+    {
+        outPosition = UnityObjectToClipPos(position);
+        outUV = uv;
+    }
+
     float4 CompositeForeground(float2 uv, float3 bg)
     {
         float3 fg = tex2D(_SourceTexture, uv).rgb;
@@ -69,28 +78,28 @@ Shader "Hidden/SelfieBarracuda/Compositor"
         Pass
         {
             CGPROGRAM
-            #pragma vertex vert_img
+            #pragma vertex Vertex
             #pragma fragment FragmentThru
             ENDCG
         }
         Pass
         {
             CGPROGRAM
-            #pragma vertex vert_img
+            #pragma vertex Vertex
             #pragma fragment FragmentMask
             ENDCG
         }
         Pass
         {
             CGPROGRAM
-            #pragma vertex vert_img
+            #pragma vertex Vertex
             #pragma fragment FragmentStatic
             ENDCG
         }
         Pass
         {
             CGPROGRAM
-            #pragma vertex vert_img
+            #pragma vertex Vertex
             #pragma fragment FragmentDynamic
             ENDCG
         }
