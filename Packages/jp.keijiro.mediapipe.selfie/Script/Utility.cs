@@ -10,9 +10,6 @@ static class RTUtil
     public const RenderTextureFormat SingleChannelFloatFormat
       = RenderTextureFormat.RHalf;
 
-    public const RenderTextureFormat DoubleChannelFloatFormat
-      = RenderTextureFormat.RGHalf;
-
     public static RenderTexture NewSingleChannelUAV(int width, int height)
     {
         var rt = new RenderTexture(width, height, 0, SingleChannelFormat);
@@ -32,36 +29,23 @@ static class RTUtil
     public static RenderTexture NewSingleChannelFloat(int width, int height)
       => new RenderTexture(width, height, 0, SingleChannelFloatFormat);
 
-    public static RenderTexture NewDoubleChannelFloat(int width, int height)
-      => new RenderTexture(width, height, 0, DoubleChannelFloatFormat);
-
-    public static RenderTexture NewDoubleChannelFloatUAV(int width, int height)
-    {
-        var rt = NewDoubleChannelFloat(width, height);
-        rt.enableRandomWrite = true;
-        rt.Create();
-        return rt;
-    }
-
-    public static RenderTexture TempSingleChannelFloat(int width, int height)
-      => RenderTexture.GetTemporary(width, height, 0, SingleChannelFloatFormat);
-
-    public static RenderTexture TempDoubleChannelFloat(int width, int height)
-      => RenderTexture.GetTemporary(width, height, 0, DoubleChannelFloatFormat);
-
     public static void ReleaseTemp(RenderTexture rt)
       => RenderTexture.ReleaseTemporary(rt);
 }
 
 static class ComputeShaderExtensions
 {
-    static int[] _int2 = new int[2];
-
-    public static void SetInts
-      (this ComputeShader compute, string name, int x, int y)
+    public static void DispatchThreads
+      (this ComputeShader compute, int kernel, int x, int y, int z)
     {
-        _int2[0] = x; _int2[1] = y;
-        compute.SetInts(name, _int2);
+        uint xc, yc, zc;
+        compute.GetKernelThreadGroupSizes(kernel, out xc, out yc, out zc);
+
+        x = (x + (int)xc - 1) / (int)xc;
+        y = (y + (int)yc - 1) / (int)yc;
+        z = (z + (int)zc - 1) / (int)zc;
+
+        compute.Dispatch(kernel, x, y, z);
     }
 }
 
