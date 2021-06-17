@@ -1,4 +1,4 @@
-Shader "Hidden/SelfieBarracuda/Composition"
+Shader "Hidden/SelfieBarracuda/Compositor"
 {
     CGINCLUDE
 
@@ -32,7 +32,9 @@ Shader "Hidden/SelfieBarracuda/Composition"
     float4 FragmentMask(float4 position : SV_Position,
                         float2 uv : TEXCOORD0) : SV_Target
     {
-        return tex2D(_MaskTexture, uv).r;
+        float4 color = tex2D(_SourceTexture, uv);
+        float mask = tex2D(_MaskTexture, uv).r;
+        return lerp(color, float4(1, 0, 0, 1), mask * 0.8);
     }
 
     float4 FragmentStatic(float4 position : SV_Position,

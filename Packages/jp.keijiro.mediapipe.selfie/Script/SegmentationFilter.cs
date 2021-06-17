@@ -84,7 +84,7 @@ public sealed class SegmentationFilter : System.IDisposable
                                        _buffers.preprocess))
             _worker.Execute(tensor);
 
-        // Postprocessing
+        // Postprocessing (erosion + bilateral filter)
         _worker.PeekOutput().ToRenderTexture(_buffers.inference);
 
         var post = _resources.postprocess;

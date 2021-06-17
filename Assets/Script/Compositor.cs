@@ -2,7 +2,7 @@ using UnityEngine;
 using UI = UnityEngine.UI;
 using MediaPipe.Selfie;
 
-public sealed class WebcamTest : MonoBehaviour
+public sealed class Compositor : MonoBehaviour
 {
     enum OutputMode { Source, Mask, StaticBG, DynamicBG }
 
@@ -11,7 +11,8 @@ public sealed class WebcamTest : MonoBehaviour
     [SerializeField] Texture2D _bgImage = null;
     [SerializeField] UI.RawImage _outputUI = null;
     [SerializeField] ResourceSet _resources = null;
-    [SerializeField] Shader _shader = null;
+
+    [SerializeField, HideInInspector] Shader _shader = null;
 
     SegmentationFilter _filter;
     RenderTexture _composited;
