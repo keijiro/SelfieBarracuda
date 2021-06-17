@@ -7,7 +7,7 @@ Texture2D<float> _Inference;
 Texture2D<float> _MaskInput;
 RWTexture2D<float> _MaskOutput;
 
-// Postprocess1: Softmax + erosion
+// Postprocess1: Erosion
 
 [numthreads(8, 8, 1)]
 void Postprocess1(uint2 id : SV_DispatchThreadID)

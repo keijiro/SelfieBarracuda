@@ -1,7 +1,7 @@
 #pragma kernel Preprocess
 
 sampler2D _InputTexture;
-RWBuffer<float> _OutputBuffer;
+RWStructuredBuffer<float> _OutputBuffer;
 int2 _Dimensions;
 
 [numthreads(8, 8, 1)]
