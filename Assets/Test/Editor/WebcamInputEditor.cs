@@ -1,8 +1,6 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace MeetBarracuda {
-
 [CustomEditor(typeof(WebcamInput))]
 sealed class WebcamInputEditor : Editor
 {
@@ -49,5 +47,3 @@ sealed class WebcamInputEditor : Editor
         serializedObject.ApplyModifiedProperties();
     }
 }
-
-} // namespace MeetBarracuda

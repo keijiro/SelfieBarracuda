@@ -1,0 +1,13 @@
+{
+  "author": "Keijiro Takahashi",
+  "dependencies": { "com.unity.barracuda": "2.1.0-preview" },
+  "description": "MediaPipe Selfie human segmentation model runtime for for Unity Barracuda",
+  "displayName": "MediaPipe Selfie",
+  "keywords": [ "unity" ],
+  "license": "Apache-2.0",
+  "name": "jp.keijiro.mediapipe.selfie",
+  "repository": "github:keijiro/SelfieBarracuda",
+  "unity": "2020.3",
+  "unityRelease": "0f1",
+  "version": "0.1.1"
+}

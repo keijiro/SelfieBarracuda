@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Barracuda;
 
-namespace MeetBarracuda {
+namespace MediaPipe.Selfie {
 
 public sealed class SegmentationFilter : System.IDisposable
 {
@@ -98,4 +98,4 @@ public sealed class SegmentationFilter : System.IDisposable
     #endregion
 }
 
-} // namespace MeetBarracuda
+} // namespace MediaPipe.Selfie

@@ -1,10 +1,10 @@
 using UnityEngine;
 using Unity.Barracuda;
 
-namespace MeetBarracuda {
+namespace MediaPipe.Selfie {
 
-[CreateAssetMenu(fileName = "MeetBarracuda",
-                 menuName = "ScriptableObjects/MeetBarracuda Resource Set")]
+[CreateAssetMenu(fileName = "SelfieBarracuda",
+                 menuName = "ScriptableObjects/SelfieBarracuda Resource Set")]
 public sealed class ResourceSet : ScriptableObject
 {
     public NNModel model;
@@ -12,4 +12,4 @@ public sealed class ResourceSet : ScriptableObject
     public ComputeShader postprocess;
 }
 
-} // namespace MeetBarracuda
+} // namespace MediaPipe.Selfie

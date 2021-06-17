@@ -1,7 +1,6 @@
 using UnityEngine;
 using UI = UnityEngine.UI;
-
-namespace MeetBarracuda {
+using MediaPipe.Selfie;
 
 public sealed class StaticImageTest : MonoBehaviour
 {
@@ -24,5 +23,3 @@ public sealed class StaticImageTest : MonoBehaviour
     // Enable for benchmarking
     // void Update() => _filter.ProcessImage(_sourceImage);
 }
-
-} // namespace MeetBarracuda

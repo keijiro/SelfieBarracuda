@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace MeetBarracuda {
+namespace MediaPipe.Selfie {
 
 static class RTUtil
 {
@@ -65,4 +65,4 @@ static class ComputeShaderExtensions
     }
 }
 
-} // namespace MeetBarracuda
+} // namespace MediaPipe.Selfie

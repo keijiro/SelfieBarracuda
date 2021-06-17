@@ -1,4 +1,4 @@
-namespace MeetBarracuda {
+namespace MediaPipe.Selfie {
 
 public static class Config
 {
@@ -6,4 +6,4 @@ public static class Config
     public const int ImageHeight = 144;
 }
 
-} // namespace MeetBarracuda
+} // namespace MediaPipe.Selfie

@@ -1,7 +1,6 @@
 using UnityEngine;
 using UI = UnityEngine.UI;
-
-namespace MeetBarracuda {
+using MediaPipe.Selfie;
 
 public sealed class WebcamTest : MonoBehaviour
 {
@@ -44,5 +43,3 @@ public sealed class WebcamTest : MonoBehaviour
         _outputUI.texture = _composited;
     }
 }
-
-} // namespace MeetBarracuda

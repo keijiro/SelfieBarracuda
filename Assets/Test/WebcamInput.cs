@@ -1,7 +1,5 @@
 using UnityEngine;
 
-namespace MeetBarracuda {
-
 public sealed class WebcamInput : MonoBehaviour
 {
     #region Editable attributes
@@ -50,5 +48,3 @@ public sealed class WebcamInput : MonoBehaviour
 
     #endregion
 }
-
-} // namespace MeetBarracuda

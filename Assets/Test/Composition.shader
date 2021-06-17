@@ -1,4 +1,4 @@
-Shader "Hidden/MeetBarracuda/Composition"
+Shader "Hidden/SelfieBarracuda/Composition"
 {
     CGINCLUDE
 
