@@ -17,7 +17,7 @@ Shader "Hidden/SelfieBarracuda/Compositor"
         outUV = uv;
     }
 
-    float4 CompositeForeground(float2 uv, float3 bg)
+    float4 CompositeMaskedForeground(float2 uv, float3 bg)
     {
         float3 fg = tex2D(_SourceTexture, uv).rgb;
         float mask = tex2D(_MaskTexture, uv).r;
@@ -29,9 +29,14 @@ Shader "Hidden/SelfieBarracuda/Compositor"
         float3 rgb = bg;
         rgb = lerp(rgb, bl, saturate((mask - 0.1) / 0.4));
         rgb = lerp(rgb, fg, saturate((mask - 0.5) / 0.4));
-        return float4(rgb , 1);
+        return float4(rgb , mask);
     }
 
+    float4 CompositeForeground(float2 uv, float3 bg)
+    {
+        return float4(CompositeMaskedForeground(uv, bg).rgb, 1);
+    }
+    
     float4 FragmentThru(float4 position : SV_Position,
                         float2 uv : TEXCOORD0) : SV_Target
     {
@@ -52,8 +57,7 @@ Shader "Hidden/SelfieBarracuda/Compositor"
         return CompositeForeground(uv, tex2D(_BGTexture, uv).rgb);
     }
 
-    float4 FragmentDynamic(float4 position : SV_Position,
-                           float2 uv : TEXCOORD0) : SV_Target
+    float3 DynamicElement(float2 uv)
     {
         // Polar coodinates
         float2 p = (uv - 0.5) * float2(_ScreenParams.x / _ScreenParams.y, 1);
@@ -67,7 +71,29 @@ Shader "Hidden/SelfieBarracuda/Compositor"
         float h = frac(hue) * 6 - 2;
         float3 rgb = saturate(float3(abs(h - 1) - 1, 2 - abs(h), 2 - abs(h - 2)));
 
+        return rgb;
+    }
+
+    float4 FragmentDynamic(float4 position : SV_Position,
+                           float2 uv : TEXCOORD0) : SV_Target
+    {
+        float3 rgb = DynamicElement(uv);
+
         return CompositeForeground(uv, rgb);
+    }
+
+    float4 FragmentMaskedStatic(float4 position : SV_Position,
+                          float2 uv : TEXCOORD0) : SV_Target
+    {
+        return CompositeMaskedForeground(uv, tex2D(_BGTexture, uv).rgb);
+    }
+    
+    float4 FragmentMaskedDynamic(float4 position : SV_Position,
+                          float2 uv : TEXCOORD0) : SV_Target
+    {
+        float3 rgb = DynamicElement(uv);
+        
+        return CompositeMaskedForeground(uv, rgb);
     }
 
     ENDCG
@@ -75,32 +101,46 @@ Shader "Hidden/SelfieBarracuda/Compositor"
     SubShader
     {
         Cull Off ZWrite Off ZTest Always
-        Pass
+        Pass // Source pass 
         {
             CGPROGRAM
             #pragma vertex Vertex
             #pragma fragment FragmentThru
             ENDCG
         }
-        Pass
+        Pass // Mask pass
         {
             CGPROGRAM
             #pragma vertex Vertex
             #pragma fragment FragmentMask
             ENDCG
         }
-        Pass
+        Pass // StaticBG pass
         {
             CGPROGRAM
             #pragma vertex Vertex
             #pragma fragment FragmentStatic
             ENDCG
         }
-        Pass
+        Pass // DynamicBG pass
         {
             CGPROGRAM
             #pragma vertex Vertex
             #pragma fragment FragmentDynamic
+            ENDCG
+        }
+        Pass // MaskedStatic pass
+        {
+            CGPROGRAM
+            #pragma vertex Vertex
+            #pragma fragment FragmentMaskedStatic
+            ENDCG
+        }
+        Pass // MaskedDynamic pass
+        {
+            CGPROGRAM
+            #pragma vertex Vertex
+            #pragma fragment FragmentMaskedDynamic
             ENDCG
         }
     }

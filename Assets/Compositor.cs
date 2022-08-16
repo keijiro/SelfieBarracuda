@@ -5,7 +5,7 @@ using Klak.TestTools;
 
 public sealed class Compositor : MonoBehaviour
 {
-    enum OutputMode { Source, Mask, StaticBG, DynamicBG }
+    enum OutputMode { Source, Mask, StaticBG, DynamicBG, MaskedStatic, MaskedDynamic }
 
     [SerializeField] ImageSource _source = null;
     [SerializeField] OutputMode _outputMode = OutputMode.StaticBG;
