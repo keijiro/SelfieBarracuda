@@ -36,6 +36,15 @@
         "com.unity.modules.imgui": "1.0.0"
       }
     },
+    "jp.keijiro.klak.nnutils": {
+      "version": "1.4.0",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.barracuda": "3.0.0"
+      },
+      "url": "https://registry.npmjs.com"
+    },
     "jp.keijiro.klak.testtools": {
       "version": "1.1.0",
       "depth": 0,
@@ -53,6 +62,7 @@
       "depth": 0,
       "source": "embedded",
       "dependencies": {
+        "jp.keijiro.klak.nnutils": "1.4.0",
         "com.unity.barracuda": "3.0.0"
       }
     },

@@ -1,25 +1,25 @@
 using UnityEngine;
 using Unity.Barracuda;
+using Klak.NNUtils;
+using Klak.NNUtils.Extensions;
 
 namespace MediaPipe.Selfie {
 
 public sealed class SegmentationFilter : System.IDisposable
 {
-    #region Public members
-
-    public Texture MaskTexture => _buffers.output;
+    #region Public methods/properties
 
     public SegmentationFilter(ResourceSet resources)
-    {
-        _resources = resources;
-        AllocateObjects();
-    }
+      => AllocateObjects(resources);
 
     public void Dispose()
       => DeallocateObjects();
 
     public void ProcessImage(Texture sourceTexture)
       => RunModel(sourceTexture);
+
+    public RenderTexture MaskTexture
+      => _output;
 
     #endregion
 
@@ -28,41 +28,50 @@ public sealed class SegmentationFilter : System.IDisposable
     ResourceSet _resources;
     (int w, int h) _size;
     IWorker _worker;
+    ImagePreprocess _preprocess;
+    (GraphicsBuffer temp1, GraphicsBuffer temp2) _buffers;
+    RenderTexture _output;
 
-    (ComputeBuffer preprocess,
-     RenderTexture inference,
-     RenderTexture temp1,
-     RenderTexture temp2,
-     RenderTexture output) _buffers;
-
-    void AllocateObjects()
+    void AllocateObjects(ResourceSet resources)
     {
+        _resources = resources;
+
+        // NN model
         var model = ModelLoader.Load(_resources.model);
 
-        var shape = model.inputs[0].shape; // NHWC
-        _size = (shape[6], shape[5]);      // (W, H)
+        // Input shape
+        var shape = model.inputs[0].GetTensorShape();
+        _size = (shape.GetWidth(), shape.GetHeight());
 
-        _worker = model.CreateWorker();
+        // GPU worker
+        _worker = model.CreateWorker(WorkerFactory.Device.GPU);
 
-        _buffers = (new ComputeBuffer(_size.w * _size.h * 3, sizeof(float)),
-                    RTUtil.NewSingleChannelFloat(_size.w, _size.h),
-                    RTUtil.NewSingleChannelFloatUAV(_size.w, _size.h),
-                    RTUtil.NewSingleChannelFloatUAV(_size.w, _size.h),
-                    RTUtil.NewSingleChannelUAV(_size.w, _size.h));
+        // Preprocessing buffers
+        _preprocess = new ImagePreprocess(_size.w, _size.h)
+          { ColorCoeffs = new Vector4(0, 0, 0, 1) };
+
+        // Working buffers
+        _buffers = (BufferUtil.NewStructured<float>(_size.w * _size.h),
+                    BufferUtil.NewStructured<float>(_size.w * _size.h));
+
+        // Output texture
+        _output = RTUtil.NewSingleChannelUAV(_size.w, _size.h);
     }
-
 
     void DeallocateObjects()
     {
         _worker?.Dispose();
         _worker = null;
 
-        _buffers.preprocess?.Dispose();
-        Object.Destroy(_buffers.inference);
-        Object.Destroy(_buffers.temp1);
-        Object.Destroy(_buffers.temp2);
-        Object.Destroy(_buffers.output);
-        _buffers = (null, null, null, null, null);
+        _preprocess?.Dispose();
+        _preprocess = null;
+
+        _buffers.temp1?.Dispose();
+        _buffers.temp2?.Dispose();
+        _buffers = (null, null);
+
+        RTUtil.Destroy(_output);
+        _output = null;
     }
 
     #endregion
@@ -72,34 +81,25 @@ public sealed class SegmentationFilter : System.IDisposable
     void RunModel(Texture source)
     {
         // Preprocessing
-        var pre = _resources.preprocess;
-        pre.SetInts("_Dimensions", _size.w, _size.h);
-
-        pre.SetTexture(0, "_InputTexture", source);
-        pre.SetBuffer(0, "_OutputBuffer", _buffers.preprocess);
-        pre.DispatchThreads(0, _size.w, _size.h, 1);
+        _preprocess.Dispatch(source, _resources.preprocess);
 
         // NN worker invocation
-        using (var tensor = new Tensor(1, _size.h, _size.w, 3,
-                                       _buffers.preprocess))
-            _worker.Execute(tensor);
+        _worker.Execute(_preprocess.Tensor);
 
         // Postprocessing (erosion + bilateral filter)
-        _worker.PeekOutput().ToRenderTexture(_buffers.inference);
-
         var post = _resources.postprocess;
         post.SetInts("_Dimensions", _size.w, _size.h);
 
-        post.SetTexture(0, "_Inference", _buffers.inference);
-        post.SetTexture(0, "_MaskOutput", _buffers.temp1);
+        post.SetBuffer(0, "_Input", _worker.PeekOutputBuffer());
+        post.SetBuffer(0, "_Output", _buffers.temp1);
         post.DispatchThreads(0, _size.w, _size.h, 1);
 
-        post.SetTexture(1, "_MaskInput", _buffers.temp1);
-        post.SetTexture(1, "_MaskOutput", _buffers.temp2);
+        post.SetBuffer(1, "_Input", _buffers.temp1);
+        post.SetBuffer(1, "_Output", _buffers.temp2);
         post.DispatchThreads(1, _size.w, _size.h, 1);
 
-        post.SetTexture(2, "_MaskInput", _buffers.temp2);
-        post.SetTexture(2, "_MaskOutput", _buffers.output);
+        post.SetBuffer(2, "_Input", _buffers.temp2);
+        post.SetTexture(2, "_OutputTexture", _output);
         post.DispatchThreads(2, _size.w, _size.h, 1);
     }
 
