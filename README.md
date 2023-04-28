@@ -16,10 +16,12 @@ inference library.
 About the ONNX file
 -------------------
 
-I converted the original model (provided in tflite format) into ONNX using
-[tflite2tensorflow].
+I converted the original model (provided in the tflite format) into ONNX using
+[tflite2tensorflow] and a small [Colab notebook].
 
 [tflite2tensorflow]: https://github.com/PINTO0309/tflite2tensorflow
+[Colab notebook]:
+  https://colab.research.google.com/drive/1t40C-cS3q1AYMj8Vpq4pUqdX0XfLr537?usp=sharing
 
 This repository only contains the landscape model (256x144). There is
 another project called [SelfieSegmentationBarracuda] that contains the general
